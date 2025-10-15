@@ -38,11 +38,7 @@ export default function Room() {
         <meshLambertMaterial map={wallTexture} color="#6b7280" />
       </mesh>
       
-      {/* Ceiling */}
-      <mesh position={[0, 6, 0]}>
-        <boxGeometry args={[16, 0.2, 12]} />
-        <meshLambertMaterial color="#374151" />
-      </mesh>
+     
       
       {/* Central pillar for visual depth */}
       <mesh position={[0, 3, 0]}>
