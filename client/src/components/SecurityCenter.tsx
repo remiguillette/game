@@ -6,13 +6,17 @@ import Operator from "./Operator";
 import Workstation from "./Workstation";
 import { useOperators } from "../hooks/useOperators";
 import { useEmergencies } from "../hooks/useEmergencies";
+import { useGameLoop } from "../hooks/useGameLoop";
 import { useSecurityCenter } from "../lib/stores/useSecurityCenter";
 
 export default function SecurityCenter() {
   const groupRef = useRef<THREE.Group>(null);
-  const { operators } = useOperators();
-  const { emergencies } = useEmergencies();
+  const { operators, updateOperatorStatus } = useOperators();
+  const { emergencies, resolveEmergency } = useEmergencies();
   const { selectedOperator, setSelectedOperator } = useSecurityCenter();
+  
+  // Game loop for automatic emergency handling
+  useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency });
 
   // Rotate the entire scene slightly for better isometric view
   useFrame(() => {
@@ -44,14 +48,23 @@ export default function SecurityCenter() {
       <Room />
       
       {/* Workstations */}
-      {workstationPositions.map((pos) => (
-        <Workstation
-          key={pos.id}
-          position={[pos.x, 0, pos.z]}
-          workstationId={pos.id.toString()}
-          isActive={emergencies.some(e => e.assignedOperator === pos.id.toString())}
-        />
-      ))}
+      {workstationPositions.map((pos) => {
+        // Find operator at this workstation
+        const operatorAtStation = operators.find(op => op.assignedWorkstation === pos.id.toString());
+        // Check if that operator is working on an emergency
+        const isActive = operatorAtStation ? 
+          (operatorAtStation.status === 'busy' || operatorAtStation.status === 'responding') : 
+          false;
+        
+        return (
+          <Workstation
+            key={pos.id}
+            position={[pos.x, 0, pos.z]}
+            workstationId={pos.id.toString()}
+            isActive={isActive}
+          />
+        );
+      })}
       
       {/* Operators */}
       {operators.map((operator) => {

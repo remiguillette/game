@@ -9,7 +9,8 @@ export default function GameUI() {
   const { selectedOperator, stats } = useSecurityCenter();
   const { phase } = useGame();
 
-  const activeEmergencies = emergencies.filter(e => e.status === 'active');
+  const activeEmergencies = emergencies.filter(e => e.status === 'active' || e.status === 'assigned');
+  const unassignedEmergencies = emergencies.filter(e => e.status === 'active');
   const selectedOp = operators.find(op => op.id === selectedOperator);
 
   return (
@@ -19,7 +20,7 @@ export default function GameUI() {
         <h2 className="text-lg font-bold mb-2 text-green-400">Security Center Control</h2>
         <div className="space-y-1 text-sm">
           <div>Status: <span className="text-blue-400">{phase}</span></div>
-          <div>Active Emergencies: <span className="text-red-400">{activeEmergencies.length}</span></div>
+          <div>Active Emergencies: <span className="text-red-400">{unassignedEmergencies.length}</span></div>
           <div>Total Operators: <span className="text-green-400">{operators.length}</span></div>
           <div>Success Rate: <span className="text-yellow-400">{stats.successRate}%</span></div>
           <div>Response Time: <span className="text-blue-400">{stats.averageResponseTime}s</span></div>
@@ -28,7 +29,7 @@ export default function GameUI() {
 
       {/* Active Emergencies - Top Right */}
       <div className="absolute top-4 right-4 bg-gray-900 bg-opacity-90 text-white p-4 rounded-lg pointer-events-auto max-w-80">
-        <h3 className="text-md font-bold mb-2 text-red-400">Active Emergencies</h3>
+        <h3 className="text-md font-bold mb-2 text-red-400">Emergencies</h3>
         <div className="max-h-60 overflow-y-auto space-y-2">
           {activeEmergencies.length === 0 ? (
             <p className="text-gray-400 text-sm">No active emergencies</p>
@@ -36,11 +37,18 @@ export default function GameUI() {
             activeEmergencies.map((emergency) => {
               const assignedOp = operators.find(op => op.id === emergency.assignedOperator);
               
+              const borderColor = emergency.status === 'assigned' ? 'border-yellow-500' : 'border-red-500';
+              const statusText = emergency.status === 'assigned' ? 'In Progress' : 'Waiting';
+              const statusColor = emergency.status === 'assigned' ? 'text-yellow-400' : 'text-red-400';
+              
               return (
-                <div key={emergency.id} className="bg-gray-800 p-3 rounded border-l-4 border-red-500">
+                <div key={emergency.id} className={`bg-gray-800 p-3 rounded border-l-4 ${borderColor}`}>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-semibold text-sm text-red-300">{emergency.type}</h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-sm text-red-300">{emergency.type}</h4>
+                        <span className={`text-xs ${statusColor}`}>({statusText})</span>
+                      </div>
                       <p className="text-xs text-gray-300 mt-1">{emergency.description}</p>
                       <div className="mt-2 text-xs">
                         <span className="text-yellow-400">Priority: {emergency.priority}</span>
@@ -50,7 +58,7 @@ export default function GameUI() {
                       </div>
                       {assignedOp && (
                         <p className="text-green-400 text-xs mt-1">
-                          Assigned to: {assignedOp.name}
+                          👤 {assignedOp.name} ({assignedOp.status})
                         </p>
                       )}
                     </div>
