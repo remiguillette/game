@@ -154,7 +154,7 @@ export default function GameUI() {
         <h3 className="text-sm font-bold mb-2 text-gray-300">Controls</h3>
         <div className="text-xs space-y-1 text-gray-400">
           <div>Click operator to select</div>
-          <div>WASD / Arrow keys to move camera</div>
+          <div>Fixed isometric view for easier navigation</div>
           <div>Space/Enter to confirm assignment</div>
           <div>ESC to cancel selection</div>
         </div>

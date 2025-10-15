@@ -1,28 +1,8 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState, useEffect } from "react";
-import { KeyboardControls } from "@react-three/drei";
 import "@fontsource/inter";
 import SecurityCenter from "./components/SecurityCenter";
 import GameUI from "./components/GameUI";
-
-// Define control keys for the game
-enum Controls {
-  forward = 'forward',
-  backward = 'backward', 
-  leftward = 'leftward',
-  rightward = 'rightward',
-  select = 'select',
-  cancel = 'cancel'
-}
-
-const controls = [
-  { name: Controls.forward, keys: ["KeyW", "ArrowUp"] },
-  { name: Controls.backward, keys: ["KeyS", "ArrowDown"] },
-  { name: Controls.leftward, keys: ["KeyA", "ArrowLeft"] },
-  { name: Controls.rightward, keys: ["KeyD", "ArrowRight"] },
-  { name: Controls.select, keys: ["Space", "Enter"] },
-  { name: Controls.cancel, keys: ["Escape"] },
-];
 
 // Check if WebGL is available
 function checkWebGLSupport(): boolean {
@@ -156,30 +136,29 @@ function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'fixed', top: 0, left: 0 }}>
-      <KeyboardControls map={controls}>
-        <Canvas
-          style={{ width: '100%', height: '100%' }}
-          camera={{
-            position: [10, 15, 10],
-            fov: 45,
-            near: 0.1,
-            far: 1000
-          }}
-        >
-          <color attach="background" args={["#1a1a2e"]} />
-          
-          {/* Isometric-style lighting */}
-          <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 20, 5]} intensity={1} />
-          <directionalLight position={[-5, 10, -5]} intensity={0.3} color="#4a9eff" />
+      <Canvas
+        orthographic
+        style={{ width: '100%', height: '100%' }}
+        camera={{
+          position: [10, 15, 10],
+          zoom: 45,
+          near: 0.1,
+          far: 1000
+        }}
+      >
+        <color attach="background" args={["#1a1a2e"]} />
 
-          <Suspense fallback={null}>
-            <SecurityCenter />
-          </Suspense>
-        </Canvas>
-        
-        <GameUI />
-      </KeyboardControls>
+        {/* Isometric-style lighting */}
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[10, 20, 5]} intensity={1} />
+        <directionalLight position={[-5, 10, -5]} intensity={0.3} color="#4a9eff" />
+
+        <Suspense fallback={null}>
+          <SecurityCenter />
+        </Suspense>
+      </Canvas>
+
+      <GameUI />
     </div>
   );
 }
