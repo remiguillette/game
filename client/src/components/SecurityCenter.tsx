@@ -1,6 +1,3 @@
-import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import * as THREE from "three";
 import Room from "./Room";
 import SurveillanceRoom from "./SurveillanceRoom";
 import BreakRoom from "./BreakRoom";
@@ -10,22 +7,15 @@ import { useOperators } from "../hooks/useOperators";
 import { useEmergencies } from "../hooks/useEmergencies";
 import { useGameLoop } from "../hooks/useGameLoop";
 import { useSecurityCenter } from "../lib/stores/useSecurityCenter";
+import Terrain from "./Terrain";
 
 export default function SecurityCenter() {
-  const groupRef = useRef<THREE.Group>(null);
   const { operators, updateOperatorStatus, improveOperatorSkill } = useOperators();
   const { emergencies, resolveEmergency } = useEmergencies();
   const { selectedOperator, setSelectedOperator, currentRoom } = useSecurityCenter();
-  
+
   // Game loop for automatic emergency handling
   useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency, improveOperatorSkill });
-
-  // Rotate the entire scene slightly for better isometric view
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(Date.now() * 0.0005) * 0.1 - 0.3;
-    }
-  });
 
   // Define workstation positions in isometric grid
   const workstationPositions = [
@@ -58,7 +48,9 @@ export default function SecurityCenter() {
   };
 
   return (
-    <group ref={groupRef}>
+    <group rotation={[0, -0.35, 0]}>
+      <Terrain />
+
       {/* Room floor and walls */}
       {renderRoom()}
       
