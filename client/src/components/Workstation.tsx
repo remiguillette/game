@@ -16,7 +16,10 @@ export default function Workstation({ position, workstationId, isActive }: Works
     if (monitorRef.current && isActive) {
       // Pulsing effect for active workstations
       const pulse = Math.sin(state.clock.elapsedTime * 4) * 0.1 + 0.9;
-      monitorRef.current.material.emissive.setScalar(pulse * 0.2);
+      const material = monitorRef.current.material as THREE.MeshLambertMaterial;
+      if (material.emissive) {
+        material.emissive.setScalar(pulse * 0.2);
+      }
     }
   });
 

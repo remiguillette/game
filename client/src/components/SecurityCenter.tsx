@@ -2,6 +2,8 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
 import Room from "./Room";
+import SurveillanceRoom from "./SurveillanceRoom";
+import BreakRoom from "./BreakRoom";
 import Operator from "./Operator";
 import Workstation from "./Workstation";
 import { useOperators } from "../hooks/useOperators";
@@ -13,7 +15,7 @@ export default function SecurityCenter() {
   const groupRef = useRef<THREE.Group>(null);
   const { operators, updateOperatorStatus } = useOperators();
   const { emergencies, resolveEmergency } = useEmergencies();
-  const { selectedOperator, setSelectedOperator } = useSecurityCenter();
+  const { selectedOperator, setSelectedOperator, currentRoom } = useSecurityCenter();
   
   // Game loop for automatic emergency handling
   useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency });
@@ -42,13 +44,26 @@ export default function SecurityCenter() {
     setSelectedOperator(operatorId === selectedOperator ? null : operatorId);
   };
 
+  // Render appropriate room based on current selection
+  const renderRoom = () => {
+    switch (currentRoom) {
+      case 'surveillance':
+        return <SurveillanceRoom />;
+      case 'breakroom':
+        return <BreakRoom />;
+      case 'dispatch':
+      default:
+        return <Room />;
+    }
+  };
+
   return (
     <group ref={groupRef}>
       {/* Room floor and walls */}
-      <Room />
+      {renderRoom()}
       
-      {/* Workstations */}
-      {workstationPositions.map((pos) => {
+      {/* Workstations - only in dispatch room */}
+      {currentRoom === 'dispatch' && workstationPositions.map((pos) => {
         // Find operator at this workstation
         const operatorAtStation = operators.find(op => op.assignedWorkstation === pos.id.toString());
         // Check if that operator is working on an emergency

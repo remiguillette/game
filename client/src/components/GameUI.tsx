@@ -6,7 +6,7 @@ import { useGame } from "../lib/stores/useGame";
 export default function GameUI() {
   const { emergencies, resolveEmergency, assignOperator } = useEmergencies();
   const { operators } = useOperators();
-  const { selectedOperator, stats } = useSecurityCenter();
+  const { selectedOperator, stats, currentRoom, setCurrentRoom } = useSecurityCenter();
   const { phase } = useGame();
 
   const activeEmergencies = emergencies.filter(e => e.status === 'active' || e.status === 'assigned');
@@ -103,6 +103,43 @@ export default function GameUI() {
           </div>
         </div>
       )}
+
+      {/* Room Switcher - Bottom Center */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-900 bg-opacity-90 text-white p-3 rounded-lg pointer-events-auto">
+        <h3 className="text-sm font-bold mb-2 text-center text-purple-400">Room</h3>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setCurrentRoom('dispatch')}
+            className={`px-3 py-1 text-xs rounded transition-colors ${
+              currentRoom === 'dispatch' 
+                ? 'bg-purple-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            🖥️ Dispatch
+          </button>
+          <button
+            onClick={() => setCurrentRoom('surveillance')}
+            className={`px-3 py-1 text-xs rounded transition-colors ${
+              currentRoom === 'surveillance' 
+                ? 'bg-purple-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            📹 Surveillance
+          </button>
+          <button
+            onClick={() => setCurrentRoom('breakroom')}
+            className={`px-3 py-1 text-xs rounded transition-colors ${
+              currentRoom === 'breakroom' 
+                ? 'bg-purple-600 text-white' 
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            }`}
+          >
+            ☕ Break Room
+          </button>
+        </div>
+      </div>
 
       {/* Controls Help - Bottom Right */}
       <div className="absolute bottom-4 right-4 bg-gray-900 bg-opacity-90 text-white p-4 rounded-lg pointer-events-auto">

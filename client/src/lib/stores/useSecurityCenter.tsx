@@ -8,14 +8,18 @@ interface GameStats {
   resolvedEmergencies: number;
 }
 
+export type RoomType = 'dispatch' | 'surveillance' | 'breakroom';
+
 interface SecurityCenterState {
   selectedOperator: string | null;
   selectedWorkstation: string | null;
+  currentRoom: RoomType;
   stats: GameStats;
   
   // Actions
   setSelectedOperator: (operatorId: string | null) => void;
   setSelectedWorkstation: (workstationId: string | null) => void;
+  setCurrentRoom: (room: RoomType) => void;
   updateStats: (newStats: Partial<GameStats>) => void;
   resetGame: () => void;
 }
@@ -31,6 +35,7 @@ export const useSecurityCenter = create<SecurityCenterState>()(
   subscribeWithSelector((set, get) => ({
     selectedOperator: null,
     selectedWorkstation: null,
+    currentRoom: 'dispatch',
     stats: initialStats,
     
     setSelectedOperator: (operatorId) => {
@@ -43,6 +48,11 @@ export const useSecurityCenter = create<SecurityCenterState>()(
       set({ selectedWorkstation: workstationId });
     },
     
+    setCurrentRoom: (room) => {
+      console.log("Switching to room:", room);
+      set({ currentRoom: room });
+    },
+    
     updateStats: (newStats) => {
       set((state) => ({
         stats: { ...state.stats, ...newStats }
@@ -53,6 +63,7 @@ export const useSecurityCenter = create<SecurityCenterState>()(
       set({
         selectedOperator: null,
         selectedWorkstation: null,
+        currentRoom: 'dispatch',
         stats: initialStats
       });
     }
