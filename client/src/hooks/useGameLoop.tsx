@@ -7,6 +7,16 @@ interface GameLoopProps {
   operators: OperatorData[];
   updateOperatorStatus: (operatorId: string, status: OperatorData['status']) => void;
   resolveEmergency: (emergencyId: string, resolution: 'resolved' | 'failed') => void;
+  improveOperatorSkill: (operatorId: string, skillType: keyof OperatorData['skills'], amount?: number) => void;
+}
+
+// Map emergency types to skill types
+function getSkillTypeForEmergency(emergencyType: string): keyof OperatorData['skills'] {
+  if (emergencyType.toLowerCase().includes('fire')) return 'fire';
+  if (emergencyType.toLowerCase().includes('medical')) return 'medical';
+  if (emergencyType.toLowerCase().includes('security') || emergencyType.toLowerCase().includes('breach')) return 'security';
+  if (emergencyType.toLowerCase().includes('technical') || emergencyType.toLowerCase().includes('failure')) return 'technical';
+  return 'technical'; // default
 }
 
 interface EmergencyProgress {
@@ -36,8 +46,8 @@ function calculateHandlingTime(priority: string, operatorExperience: number): nu
   return Math.floor(baseTime * experienceMultiplier);
 }
 
-// Calculate success chance based on operator experience and emergency priority
-function calculateSuccessChance(priority: string, operatorExperience: number): number {
+// Calculate success chance based on operator skills and emergency type/priority
+function calculateSuccessChance(priority: string, emergencyType: string, operator: OperatorData): number {
   const baseChances = {
     'low': 0.95,
     'medium': 0.85,
@@ -47,13 +57,20 @@ function calculateSuccessChance(priority: string, operatorExperience: number): n
   
   const baseChance = baseChances[priority as keyof typeof baseChances] || 0.8;
   
-  // Higher experience increases success chance
-  const experienceBonus = (operatorExperience - 50) / 200; // 0 to 0.25 bonus
+  // Get relevant skill for this emergency type
+  const skillType = getSkillTypeForEmergency(emergencyType);
+  const relevantSkill = operator.skills[skillType];
   
-  return Math.min(0.98, baseChance + experienceBonus);
+  // Skill bonus: 0 to 0.3 based on skill level (0-100)
+  const skillBonus = (relevantSkill / 100) * 0.3;
+  
+  // Specialty bonus: extra 0.1 if operator specialty matches emergency
+  const specialtyBonus = operator.specialty === skillType ? 0.1 : 0;
+  
+  return Math.min(0.99, baseChance + skillBonus + specialtyBonus);
 }
 
-export function useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency }: GameLoopProps) {
+export function useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency, improveOperatorSkill }: GameLoopProps) {
   
   useEffect(() => {
     // Check for newly assigned emergencies
@@ -100,12 +117,19 @@ export function useGameLoop({ emergencies, operators, updateOperatorStatus, reso
         // Check if handling time is complete
         const elapsed = now - progress.startTime;
         if (elapsed >= progress.requiredTime) {
-          // Determine success or failure
-          const successChance = calculateSuccessChance(emergency.priority, operator.experience);
+          // Determine success or failure based on skills
+          const successChance = calculateSuccessChance(emergency.priority, emergency.type, operator);
           const success = Math.random() < successChance;
           
           // Resolve the emergency
           resolveEmergency(emergencyId, success ? 'resolved' : 'failed');
+          
+          // If successful, improve operator's relevant skill
+          if (success) {
+            const skillType = getSkillTypeForEmergency(emergency.type);
+            improveOperatorSkill(operator.id, skillType, 2);
+            console.log(`${operator.name} improved ${skillType} skill (success handling ${emergency.type})`);
+          }
           
           // Set operator back to idle
           updateOperatorStatus(operator.id, 'idle');

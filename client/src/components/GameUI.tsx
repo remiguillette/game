@@ -88,7 +88,7 @@ export default function GameUI() {
 
       {/* Operator Info - Bottom Left */}
       {selectedOp && (
-        <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-90 text-white p-4 rounded-lg pointer-events-auto">
+        <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-90 text-white p-4 rounded-lg pointer-events-auto min-w-64">
           <h3 className="text-md font-bold mb-2 text-blue-400">Selected Operator</h3>
           <div className="space-y-1 text-sm">
             <div>Name: <span className="text-green-400">{selectedOp.name}</span></div>
@@ -96,10 +96,18 @@ export default function GameUI() {
               selectedOp.status === 'idle' ? 'text-green-400' :
               selectedOp.status === 'busy' ? 'text-red-400' : 'text-yellow-400'
             }`}>{selectedOp.status}</span></div>
+            <div>Specialty: <span className="text-purple-400 capitalize">{selectedOp.specialty}</span></div>
             <div>Experience: <span className="text-blue-400">{selectedOp.experience}%</span></div>
-            <div>Workstation: <span className="text-purple-400">
-              {selectedOp.assignedWorkstation || 'Unassigned'}
-            </span></div>
+            <div className="pt-2 border-t border-gray-700">
+              <div className="text-xs text-gray-400 mb-1">Skills:</div>
+              <div className="grid grid-cols-2 gap-1 text-xs">
+                <div>🔥 Fire: <span className="text-orange-400">{selectedOp.skills.fire}</span></div>
+                <div>⚕️ Medical: <span className="text-red-400">{selectedOp.skills.medical}</span></div>
+                <div>🔒 Security: <span className="text-blue-400">{selectedOp.skills.security}</span></div>
+                <div>⚙️ Technical: <span className="text-green-400">{selectedOp.skills.technical}</span></div>
+              </div>
+            </div>
+            <div className="text-xs text-gray-500">Station: {selectedOp.assignedWorkstation || 'None'}</div>
           </div>
         </div>
       )}

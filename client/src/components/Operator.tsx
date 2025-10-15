@@ -2,11 +2,22 @@ import { useState, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+export type OperatorSpecialty = 'fire' | 'medical' | 'security' | 'technical' | 'general';
+
+export interface OperatorSkills {
+  fire: number;
+  medical: number;
+  security: number;
+  technical: number;
+}
+
 export interface OperatorData {
   id: string;
   name: string;
   status: 'idle' | 'busy' | 'responding';
   experience: number;
+  specialty: OperatorSpecialty;
+  skills: OperatorSkills;
   assignedWorkstation?: string;
   x: number;
   z: number;

@@ -13,12 +13,12 @@ import { useSecurityCenter } from "../lib/stores/useSecurityCenter";
 
 export default function SecurityCenter() {
   const groupRef = useRef<THREE.Group>(null);
-  const { operators, updateOperatorStatus } = useOperators();
+  const { operators, updateOperatorStatus, improveOperatorSkill } = useOperators();
   const { emergencies, resolveEmergency } = useEmergencies();
   const { selectedOperator, setSelectedOperator, currentRoom } = useSecurityCenter();
   
   // Game loop for automatic emergency handling
-  useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency });
+  useGameLoop({ emergencies, operators, updateOperatorStatus, resolveEmergency, improveOperatorSkill });
 
   // Rotate the entire scene slightly for better isometric view
   useFrame(() => {
